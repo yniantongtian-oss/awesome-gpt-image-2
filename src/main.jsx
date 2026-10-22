@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   ArrowUpRight,
-  BarChart3,
+  ChartColumn,
   Bot,
   ChevronDown,
   Check,
@@ -12,9 +12,8 @@ import {
   Crown,
   Eye,
   EyeOff,
-  Github,
   Heart,
-  ImageIcon,
+  Image,
   KeyRound,
   LoaderCircle,
   LogIn,
@@ -28,13 +27,15 @@ import {
   Sparkles,
   Terminal,
   TrendingUp,
-  UserCircle,
+  CircleUser,
   UserPlus,
   Users,
   WandSparkles,
   X
 } from 'lucide-react';
 import './styles.css';
+import { GithubMark } from './githubMark';
+import { fillTemplateBlanks, listTemplateBlanks } from './templateBlanks';
 import { isSupabaseConfigured, supabase } from './supabaseClient';
 import {
   clearPendingGeneration,
@@ -321,6 +322,8 @@ const copy = {
     adminOnly: 'Only super admins can view this page.',
     fullPrompt: 'Full Prompt',
     templatePrompt: 'Template Prompt',
+    fillBlanks: 'Fill the blanks',
+    blankHint: 'Replace each bracket, then copy the finished prompt.',
     useWhen: 'Use When',
     guidance: 'Guidance',
     pitfalls: 'Pitfalls',
@@ -579,6 +582,8 @@ const copy = {
     adminOnly: '仅超级管理员可查看。',
     fullPrompt: '完整 Prompt',
     templatePrompt: '模板 Prompt',
+    fillBlanks: '填写空位',
+    blankHint: '替换方括号里的内容，再复制完整 Prompt。',
     useWhen: '适用场景',
     guidance: '使用建议',
     pitfalls: '防坑指南',
@@ -1029,7 +1034,7 @@ function TransactionItem({ transaction, language, casesById, onOpenCase }) {
             onClick={() => caseItem && onOpenCase?.(caseItem)}
             disabled={!caseItem}
           >
-            <ImageIcon size={14} />
+            <Image size={14} />
             {caseLabel}
           </button>
         ) : null}
@@ -1126,7 +1131,7 @@ function Hero({ latestCases, language, repoUrl, totalCases, categoryCount, onOpe
             <ArrowUpRight size={18} />
           </a>
           <a className="secondaryAction" href={repoUrl} target="_blank" rel="noreferrer">
-            <Github size={18} />
+            <GithubMark size={18} />
             {t.githubProject}
           </a>
           <a
@@ -1380,7 +1385,7 @@ function AuthModal({ open, language, initialErrorCode, onClose }) {
           <X size={20} />
         </button>
         <div className="authIcon">
-          <UserCircle size={28} />
+          <CircleUser size={28} />
         </div>
         <h2 id="auth-title">{t.signInTitle}</h2>
         <p>{t.signInSubtitle}</p>
@@ -1575,14 +1580,14 @@ function UserMenu({ language, session, profile, onSignIn, onSignOut, onAdmin, on
         onClick={() => setOpen((current) => !current)}
       >
         <span className="avatarBadge">
-          {avatarUrl ? <img src={avatarUrl} alt="" /> : <UserCircle size={18} />}
+          {avatarUrl ? <img src={avatarUrl} alt="" /> : <CircleUser size={18} />}
         </span>
         <ChevronDown size={15} />
       </button>
       {open ? (
         <div className="dropdownMenu userDropdown" role="menu">
           <div className="userSummary">
-            {avatarUrl ? <img className="userSummaryAvatar" src={avatarUrl} alt="" /> : <UserCircle size={32} />}
+            {avatarUrl ? <img className="userSummaryAvatar" src={avatarUrl} alt="" /> : <CircleUser size={32} />}
             <div>
               <strong>{displayName}</strong>
               <span>{email}</span>
@@ -1776,7 +1781,7 @@ function AccountPanel({
         </button>
         <div className="accountHeader">
           <div className="accountAvatar">
-            {avatarUrl ? <img src={avatarUrl} alt="" /> : <UserCircle size={44} />}
+            {avatarUrl ? <img src={avatarUrl} alt="" /> : <CircleUser size={44} />}
           </div>
           <div>
             <span className="eyebrow">
@@ -2287,7 +2292,7 @@ function AdminPanel({ open, language, session, casesById, onClose, onOpenCase })
                 </p>
               ) : null}
               <div className="adminMetricGrid">
-                <AdminMetricCard icon={<BarChart3 size={18} />} label={t.pv} value={firstNumber(trafficTotals.pv, trafficTotals.pageViews)} />
+                <AdminMetricCard icon={<ChartColumn size={18} />} label={t.pv} value={firstNumber(trafficTotals.pv, trafficTotals.pageViews)} />
                 <AdminMetricCard icon={<Users size={18} />} label={t.uv} value={firstNumber(trafficTotals.uv, trafficTotals.activeUsers)} />
                 <AdminMetricCard icon={<ReceiptText size={18} />} label={t.visits} value={firstNumber(trafficTotals.visits, trafficTotals.sessions)} />
                 <AdminMetricCard icon={<UserPlus size={18} />} label={t.newUsers} value={trafficTotals.newUsers} />
@@ -2326,7 +2331,7 @@ function AdminPanel({ open, language, session, casesById, onClose, onOpenCase })
               <div className="adminMetricGrid">
                 <AdminMetricCard icon={<Users size={18} />} label={t.registeredUsers} value={firstNumber(businessTotals.registeredUsers, business.totalUsers)} hint={`${t.newRegistrations}: ${formatNumber(firstNumber(businessRange.newRegistrations, business.rangeUsers))}`} />
                 <AdminMetricCard icon={<Crown size={18} />} label={t.activeMemberships} value={firstNumber(businessTotals.activeMembers, business.activeMemberships)} hint={`${t.newMembers}: ${formatNumber(firstNumber(businessRange.newMembers, business.rangeMemberships))}`} />
-                <AdminMetricCard icon={<ImageIcon size={18} />} label={t.totalGenerationsMetric} value={firstNumber(businessTotals.totalGenerations, business.totalGenerations)} hint={`${t.rangeGenerations}: ${formatNumber(firstNumber(businessRange.generations, business.rangeGenerations))}`} />
+                <AdminMetricCard icon={<Image size={18} />} label={t.totalGenerationsMetric} value={firstNumber(businessTotals.totalGenerations, business.totalGenerations)} hint={`${t.rangeGenerations}: ${formatNumber(firstNumber(businessRange.generations, business.rangeGenerations))}`} />
                 <AdminMetricCard icon={<PackageCheck size={18} />} label={t.succeeded} value={firstNumber(businessTotals.succeededGenerations, business.succeededGenerations)} hint={`${t.rangeGenerations}: ${formatNumber(firstNumber(businessRange.succeededGenerations, business.rangeSucceededGenerations))}`} />
                 <AdminMetricCard icon={<Coins size={18} />} label={t.creditsConsumed} value={firstNumber(businessTotals.totalCreditsConsumed, business.totalGenerationCredits)} hint={`${t.rangeGenerations}: ${formatNumber(firstNumber(businessRange.creditsConsumed, business.rangeGenerationCredits))}`} />
                 <AdminMetricCard icon={<X size={18} />} label={t.failed} value={firstNumber(businessTotals.failedGenerations, business.failedGenerations)} />
@@ -2420,7 +2425,7 @@ function AdminPanel({ open, language, session, casesById, onClose, onOpenCase })
                   <tr key={user.id}>
                     <td>
                       <div className="adminUserCell">
-                        {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <UserCircle size={28} />}
+                        {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <CircleUser size={28} />}
                         <div>
                           <strong>{user.email}</strong>
                           {user.fullName ? <span>{user.fullName}</span> : null}
@@ -2445,7 +2450,7 @@ function AdminPanel({ open, language, session, casesById, onClose, onOpenCase })
                           }}
                           disabled={!casesById?.has(user.usage.lastGenerationCaseId)}
                         >
-                          <ImageIcon size={14} />
+                          <Image size={14} />
                           #{user.usage.lastGenerationCaseId}
                         </button>
                       ) : '-'}
@@ -2845,7 +2850,7 @@ function SkillSection({ language, repoUrl }) {
           </div>
           <div className="skillActions">
             <a href={skillSourceUrl} target="_blank" rel="noreferrer">
-              <Github size={18} />
+              <GithubMark size={18} />
               {t.skillOpenDocs}
             </a>
             <a href={npmUrl} target="_blank" rel="noreferrer">
@@ -2998,11 +3003,11 @@ function PromptCard({
             {t.viewDetails}
           </button>
           <button type="button" onClick={() => onGenerate(caseItem)}>
-            <ImageIcon size={17} />
+            <Image size={17} />
             {t.generateTest}
           </button>
           <a href={caseItem.githubUrl} target="_blank" rel="noreferrer" aria-label={t.openOnGithub}>
-            <Github size={18} />
+            <GithubMark size={18} />
             GitHub
           </a>
         </div>
@@ -3034,6 +3039,7 @@ function PreviewDialog({
   const t = copy[language];
   const repoDocsUrl = `${styleLibrary.repository || fallbackRepoUrl}/blob/main/${styleLibrary.templateDocument}`;
   const [editablePrompt, setEditablePrompt] = useState('');
+  const [blankValues, setBlankValues] = useState({});
   const [generationState, setGenerationState] = useState({
     status: 'idle',
     image: '',
@@ -3061,6 +3067,10 @@ function PreviewDialog({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [preview, onClose]);
+
+  useEffect(() => {
+    setBlankValues({});
+  }, [preview?.type, preview?.item?.id, language]);
 
   useEffect(() => {
     pollControllerRef.current?.abort();
@@ -3236,7 +3246,9 @@ function PreviewDialog({
   const description = isTemplate ? textFor(item.description, language) : compactText(item.promptPreview);
   const image = isTemplate ? item.cover : item.image;
   const imageAlt = isTemplate ? title : item.imageAlt;
-  const promptText = isTemplate ? formatTemplatePrompt(item, language, styleLibrary) : editablePrompt;
+  const templateSource = isTemplate ? formatTemplatePrompt(item, language, styleLibrary) : '';
+  const templateBlanks = isTemplate ? listTemplateBlanks(templateSource) : [];
+  const promptText = isTemplate ? fillTemplateBlanks(templateSource, blankValues) : editablePrompt;
   const copyId = isTemplate ? `template-${item.id}` : `case-${item.id}`;
   const isCopied = copiedId === copyId;
   const primaryLink = isTemplate ? `${repoDocsUrl}#${item.anchor}` : item.githubUrl;
@@ -3442,7 +3454,7 @@ function PreviewDialog({
             </button>
             {!isTemplate ? (
               <button type="button" onClick={handleGenerate} disabled={generationLocked}>
-                {isGenerating ? <LoaderCircle className="spinIcon" size={17} /> : <ImageIcon size={17} />}
+                {isGenerating ? <LoaderCircle className="spinIcon" size={17} /> : <Image size={17} />}
                 {generationButtonLabel}
               </button>
             ) : null}
@@ -3467,7 +3479,27 @@ function PreviewDialog({
               ) : null}
             </div>
             {isTemplate ? (
-              <pre className="promptBlock">{promptText}</pre>
+              <>
+                {templateBlanks.length ? (
+                  <div className="templateBlanks">
+                    <h3>{t.fillBlanks}</h3>
+                    <p className="templateBlankHint">{t.blankHint}</p>
+                    {templateBlanks.map((label) => (
+                      <label className="templateBlankField" key={label}>
+                        <span>{label}</span>
+                        <input
+                          value={blankValues[label] || ''}
+                          onChange={(event) => {
+                            const nextValue = event.target.value;
+                            setBlankValues((current) => ({ ...current, [label]: nextValue }));
+                          }}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                ) : null}
+                <pre className="promptBlock">{promptText}</pre>
+              </>
             ) : (
               <textarea
                 className="promptEditor"
@@ -3504,7 +3536,7 @@ function PreviewDialog({
               ) : null}
               <div className="generationButtons">
                 <button className="generationPrimaryButton" type="button" onClick={handleGenerate} disabled={generationLocked}>
-                  {isGenerating ? <LoaderCircle className="spinIcon" size={17} /> : <ImageIcon size={17} />}
+                  {isGenerating ? <LoaderCircle className="spinIcon" size={17} /> : <Image size={17} />}
                   {generationButtonLabel}
                 </button>
                 {!hasPersonalKey && !isSignedIn ? (

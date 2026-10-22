@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft,
   Check,
-  CheckCircle2,
+  CircleCheck,
   CircleAlert,
   Clock3,
   CreditCard,
@@ -476,7 +476,7 @@ export function CommunityPage({
               ><p>{t.pendingText}</p></CommunityStateCard>
             ) : null}
             {view === 'paid' ? (
-              <CommunityStateCard icon={<CheckCircle2 size={24} />} title={t.paidTitle} tone="success">
+              <CommunityStateCard icon={<CircleCheck size={24} />} title={t.paidTitle} tone="success">
                 <p>{t.paidText}</p>
                 {qrUrl ? <img className="communityProtectedQr" src={qrUrl} alt={t.qrAlt} /> : null}
               </CommunityStateCard>

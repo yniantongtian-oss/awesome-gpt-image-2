@@ -9,7 +9,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         gallery: fileURLToPath(new URL('./index.html', import.meta.url)),
         image25: fileURLToPath(new URL('./gpt-image-2-5/index.html', import.meta.url))
