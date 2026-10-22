@@ -5,6 +5,7 @@ import {
   getStripeClient,
   isStripeConfigured,
   readRawBody,
+  subscriptionIdFromInvoice,
   upsertMembershipFromSubscription
 } from '../_lib/billing.js';
 
@@ -76,7 +77,7 @@ async function handleCheckoutCompleted(client, stripe, session) {
 async function handleInvoicePaid(client, stripe, invoice) {
   if (invoice.billing_reason === 'subscription_create') return;
 
-  const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id;
+  const subscriptionId = subscriptionIdFromInvoice(invoice);
   if (!subscriptionId) return;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);

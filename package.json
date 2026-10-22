@@ -16,19 +16,22 @@
     "prebuild": "npm run generate:site-data && npm run generate:style-skill",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test api/_lib/*.test.js",
+    "test": "node --test",
     "test:apimart": "node --test shared/apimart.test.js src/apimartClient.test.js api/_lib/apimart.test.js api/_lib/generation.test.js"
   },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "dependencies": {
-    "@google-analytics/data": "^5.2.2",
-    "@supabase/supabase-js": "^2.105.4",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@google-analytics/data": "^6.1.0",
+    "@supabase/supabase-js": "^2.118.0",
+    "@vitejs/plugin-react": "^6.1.2",
     "alipay-sdk": "^4.14.0",
     "google-auth-library": "^10.6.2",
-    "lucide-react": "^0.561.0",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
-    "stripe": "^22.1.1",
-    "vite": "^7.2.7"
+    "lucide-react": "^1.61.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "stripe": "^23.0.0",
+    "vite": "^8.3.5"
   }
 }

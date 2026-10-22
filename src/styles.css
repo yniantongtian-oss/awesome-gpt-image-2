@@ -1703,6 +1703,50 @@ button {
   font-weight: 900;
 }
 
+.templateBlanks {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.templateBlanks h3 {
+  margin: 0;
+}
+
+.templateBlankHint {
+  margin: 0;
+  color: #b7c7de;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.templateBlankField {
+  display: grid;
+  gap: 6px;
+}
+
+.templateBlankField span {
+  color: #d5e4f8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.templateBlankField input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(3, 7, 15, 0.72);
+  color: #e8f7ff;
+  font: 13px/1.5 ui-sans-serif, system-ui, sans-serif;
+}
+
+.templateBlankField input:focus {
+  outline: none;
+  border-color: rgba(103, 232, 249, 0.72);
+  box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.1);
+}
+
 .promptBlock {
   max-height: 360px;
   margin: 0;

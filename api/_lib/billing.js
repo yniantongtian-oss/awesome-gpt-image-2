@@ -1,6 +1,8 @@
 import Stripe from 'stripe';
 
-const STRIPE_API_VERSION = '2026-02-25.clover';
+// stripe-node 23 pins 2026-09-30.endive. Checkout no longer accepts
+// payment_method_types; this integration already uses dynamic payment methods.
+export const STRIPE_API_VERSION = '2026-09-30.endive';
 const DEFAULT_APP_URL = 'https://gpt-image2.canghe.ai';
 
 let stripeClient;
@@ -246,6 +248,34 @@ function stripeTimestampToIso(value) {
   return value ? new Date(value * 1000).toISOString() : null;
 }
 
+function stripeId(value) {
+  if (typeof value === 'string' && value) return value;
+  if (value && typeof value === 'object' && typeof value.id === 'string' && value.id) return value.id;
+  return '';
+}
+
+// Basil (2025-03-31) removed Invoice.subscription. Endive webhooks put the id
+// on parent.subscription_details, with a line-item fallback. Older webhook
+// endpoints can still send the legacy field.
+export function subscriptionIdFromInvoice(invoice) {
+  if (!invoice || typeof invoice !== 'object') return '';
+  const parentSubscription = invoice.parent?.subscription_details?.subscription;
+  const lineSubscription = invoice.lines?.data
+    ?.map((line) => line?.parent?.subscription_item_details?.subscription)
+    .find(Boolean);
+  return stripeId(parentSubscription) || stripeId(lineSubscription) || stripeId(invoice.subscription);
+}
+
+// Basil moved billing periods onto subscription items. Prefer the item, and
+// keep the legacy subscription fields for webhook payloads from older API versions.
+export function subscriptionPeriodBounds(subscription) {
+  const item = subscription?.items?.data?.[0] || {};
+  return {
+    currentPeriodStart: stripeTimestampToIso(item.current_period_start || subscription?.current_period_start),
+    currentPeriodEnd: stripeTimestampToIso(item.current_period_end || subscription?.current_period_end)
+  };
+}
+
 function normalizeSubscriptionStatus(status) {
   if (['trialing', 'active', 'past_due', 'canceled', 'unpaid'].includes(status)) return status;
   return 'inactive';
@@ -256,15 +286,15 @@ export async function upsertMembershipFromSubscription(client, subscription, fal
   const planId = subscription.metadata?.productId || subscription.metadata?.planId || fallback.planId;
   if (!userId || !planId) return null;
 
-  const item = subscription.items?.data?.[0] || {};
+  const periods = subscriptionPeriodBounds(subscription);
   const payload = {
     user_id: userId,
     plan_id: planId,
     status: normalizeSubscriptionStatus(subscription.status),
     stripe_customer_id: typeof subscription.customer === 'string' ? subscription.customer : fallback.customerId || null,
     stripe_subscription_id: subscription.id,
-    current_period_start: stripeTimestampToIso(subscription.current_period_start || item.current_period_start),
-    current_period_end: stripeTimestampToIso(subscription.current_period_end || item.current_period_end),
+    current_period_start: periods.currentPeriodStart,
+    current_period_end: periods.currentPeriodEnd,
     cancel_at_period_end: Boolean(subscription.cancel_at_period_end)
   };
 
